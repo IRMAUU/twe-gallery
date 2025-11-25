@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="apple-touch-icon" href="iconapp.png"
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TWE gallery</title>
+<style>
+  body {
+    margin: 0;
+    background: #000;
+    color: #ff1500;
+    font-family: 'ZCOOL QingKe HuangYou', cursive;
+    text-align: center;
+  }
+
+  #logo { 
+    width: 70%; 
+    max-width: 100%; 
+    margin: 20px auto; 
+    display: block; 
+  }
+
+  .game-container { 
+    display: none; 
+    margin: 20px auto; /* keeps container centered */
+    max-width: 1200px; /* prevents stretching too wide */
+    position: relative;
+    border-radius: 8px; /* optional, soft corners */
+    overflow: hidden;
+  }
+
+  canvas { 
+    display: block; 
+    margin: 0 auto; 
+    background: #0c0c0c; 
+  }
+
+  #twegallery-container canvas { 
+    width: 80%; 
+    height: auto; 
+    aspect-ratio: 16/9; 
+  }
+
+  #Mtwegallery-container canvas { 
+    width: 90%; 
+    height: auto; 
+    aspect-ratio: 9/16; 
+  }
+
+  /* Spinning logo style */
+  .loading-logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 90px; /* slightly smaller */
+    height: 90px; /* slightly smaller */
+    transform: translate(-50%, -50%);
+    animation: spin 4s linear infinite; /* slower spin */
+    pointer-events: none; /* ensures it doesn't block clicks */
+  }
+
+  @keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+</style>
+</head>
+<body>
+
+<img id="logo" src="twegall-logo.png" alt="Logo">
+
+<!-- Desktop Game -->
+<div id="twegallery-container" class="game-container">
+  <img src="loading-logo.png" class="loading-logo" id="desktop-loading-logo">
+  <canvas id="twegallery-canvas"></canvas>
+</div>
+
+<!-- Mobile Game -->
+<div id="Mtwegallery-container" class="game-container">
+  <img src="loading-logo.png" class="loading-logo" id="mobile-loading-logo">
+  <canvas id="Mtwegallery-canvas"></canvas>
+</div>
+
+<script>
+let unityInstance = null;
+let currentPlatform = null; // "desktop" or "mobile"
+
+// simple Unity init function
+function initUnity(canvasId, loaderUrl, dataUrl, frameworkUrl, codeUrl, productName, logoId) {
+    return new Promise(resolve => {
+        const canvas = document.getElementById(canvasId);
+        const loadingLogo = document.getElementById(logoId);
+
+        // make sure the spinning logo is visible
+        loadingLogo.style.display = "block";
+
+        const loaderScript = document.createElement("script");
+        loaderScript.src = loaderUrl;
+
+        loaderScript.onload = () => {
+            createUnityInstance(canvas, {
+                dataUrl: dataUrl,
+                frameworkUrl: frameworkUrl,
+                codeUrl: codeUrl,
+                streamingAssetsUrl: "StreamingAssets",
+                companyName: "DefaultCompany",
+                productName: productName,
+                productVersion: "0.1"
+            }).then(instance => {
+                unityInstance = instance;
+
+                // remove spinning logo once Unity is loaded
+                loadingLogo.style.display = "none";
+
+                resolve();
+            });
+        };
+        document.body.appendChild(loaderScript);
+    });
+}
+
+// unload Unity instance
+function unloadUnity() {
+    if (unityInstance) {
+        unityInstance.Quit();
+        unityInstance = null;
+    }
+}
+
+// check screen width and show appropriate game
+function checkScreen() {
+    const width = window.innerWidth;
+
+    if(width > 768){
+        // DESKTOP
+        document.getElementById("twegallery-container").style.display = "block";
+        document.getElementById("Mtwegallery-container").style.display = "none";
+
+        if(currentPlatform !== "desktop"){
+            unloadUnity();
+            initUnity(
+                "twegallery-canvas",
+                "twegallery.loader.js",
+                "twegallery.data",
+                "twegallery.framework.js",
+                "twegallery.wasm",
+                "twegallery",
+                "desktop-loading-logo"
+            );
+            currentPlatform = "desktop";
+        }
+    } else {
+        // MOBILE
+        document.getElementById("twegallery-container").style.display = "none";
+        document.getElementById("Mtwegallery-container").style.display = "block";
+
+        if(currentPlatform !== "mobile"){
+            unloadUnity();
+            initUnity(
+                "Mtwegallery-canvas",
+                "Mtwegallery.loader.js",
+                "Mtwegallery.data",
+                "Mtwegallery.framework.js",
+                "Mtwegallery.wasm",
+                "Mtwegallery",
+                "mobile-loading-logo"
+            );
+            currentPlatform = "mobile";
+        }
+    }
+}
+
+// initial check + resize listener
+checkScreen();
+window.addEventListener("resize", checkScreen);
+
+</script>
+
+</body>
+</html>
