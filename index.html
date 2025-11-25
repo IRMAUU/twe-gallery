@@ -13,45 +13,43 @@
     font-family: 'ZCOOL QingKe HuangYou', cursive;
     text-align: center;
   }
-
-  #logo { 
-    width: 70%; 
-    max-width: 100%; 
-    margin: 20px auto; 
-    display: block; 
+  #logo {
+    width: 70%;
+    max-width: 100%;
+    margin: 20px auto;
+    display: block;
   }
-
-  .game-container { 
-    display: none; 
-    margin: 20px auto; 
-    max-width: 1750px; 
+  .game-container {
+    display: none;
+    margin: 20px auto;
+    max-width: 1200px;
     position: relative;
     border-radius: 8px;
     overflow: hidden;
-    aspect-ratio: 16/9; /* default aspect ratio, will scale for mobile below */
+    background: #0c0c0c;
   }
-
-  #Mtwegallery-container { 
-    aspect-ratio: 9/16; /* mobile ratio override */
-  }
-
-  canvas { 
-    display: block; 
-    width: 85%;
-    height: 85%;
-    background: #0c0c0c; 
-  }
-
-  .under-construction {
-    position: absolute;
-    top: 0;
-    left: 0;
+  canvas {
+    display: block;
+    margin: 0 auto;
+    background: #0c0c0c;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    z-index: 1;
   }
 
+  /* Desktop 16:9 */
+  #twegallery-container {
+    aspect-ratio: 16 / 9;
+  }
+  #twegallery-container canvas { width: 80%; height: auto; }
+
+  /* Mobile 9:16 */
+  #Mtwegallery-container {
+    aspect-ratio: 9 / 16;
+    max-width: 600px;
+  }
+  #Mtwegallery-container canvas { width: 90%; height: auto; }
+
+  /* Spinning logo - now BELOW the image */
   .loading-logo {
     position: absolute;
     top: 50%;
@@ -61,57 +59,47 @@
     transform: translate(-50%, -50%);
     animation: spin 4s linear infinite;
     pointer-events: none;
-    z-index: 2;
+    z-index: 5;               /* ← lower than the image */
+  }
+
+  /* Under Construction image - now ON TOP */
+  .under-construction {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 10;              /* ← higher than the logo */
+    pointer-events: none;
   }
 
   @keyframes spin {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to   { transform: translate(-50%, -50%) rotate(360deg); }
   }
+
+  /* Show correct container */
+  @media (min-width: 769px) { #twegallery-container { display: block; } }
+  @media (max-width: 768px)  { #Mtwegallery-container { display: block; } }
 </style>
 </head>
 <body>
 
 <img id="logo" src="twegall-logo.png" alt="Logo">
 
-<!-- Desktop Under Construction -->
+<!-- Desktop -->
 <div id="twegallery-container" class="game-container">
-  <img src="loading-logo.png" class="loading-logo" id="desktop-loading-logo">
-    <img src="ucdesk.png" class="under-construction">
   <canvas id="twegallery-canvas"></canvas>
+  <img src="loading-logo.png" class="loading-logo">
+  <img src="ucdesk.png" class="under-construction" alt="Under Construction">
 </div>
 
-<!-- Mobile Under Construction -->
+<!-- Mobile -->
 <div id="Mtwegallery-container" class="game-container">
-  <img src="loading-logo.png" class="loading-logo" id="mobile-loading-logo">
-  <img src="ucmob.png" class="under-construction">
   <canvas id="Mtwegallery-canvas"></canvas>
+  <img src="loading-logo.png" class="loading-logo">
+  <img src="ucmob.png" class="under-construction" alt="Under Construction">
 </div>
-
-<script>
-let currentPlatform = null;
-
-// check screen width and show appropriate container
-function checkScreen() {
-    const width = window.innerWidth;
-
-    if(width > 768){
-        // DESKTOP
-        document.getElementById("twegallery-container").style.display = "block";
-        document.getElementById("Mtwegallery-container").style.display = "none";
-        currentPlatform = "desktop";
-    } else {
-        // MOBILE
-        document.getElementById("twegallery-container").style.display = "none";
-        document.getElementById("Mtwegallery-container").style.display = "block";
-        currentPlatform = "mobile";
-    }
-}
-
-// initial check + resize listener
-checkScreen();
-window.addEventListener("resize", checkScreen);
-</script>
 
 </body>
 </html>
