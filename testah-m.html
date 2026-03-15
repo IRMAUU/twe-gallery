@@ -75,12 +75,18 @@
 <script>
 let unityInstance = null;
 let currentPlatform = null;
+let currentLoaderScript = null;
 
 function initUnity(canvasId, loaderUrl, dataUrl, frameworkUrl, codeUrl, productName, logoId) {
     return new Promise((resolve, reject) => {
         const canvas = document.getElementById(canvasId);
         const loadingLogo = document.getElementById(logoId);
         loadingLogo.style.display = "block";
+
+        if (currentLoaderScript) {
+            currentLoaderScript.remove();
+            currentLoaderScript = null;
+        }
 
         const loaderScript = document.createElement("script");
         loaderScript.src = loaderUrl;
@@ -96,6 +102,7 @@ function initUnity(canvasId, loaderUrl, dataUrl, frameworkUrl, codeUrl, productN
             }).then(instance => {
                 unityInstance = instance;
                 loadingLogo.style.display = "none";
+                currentLoaderScript = loaderScript;
                 resolve();
             }).catch(err => {
                 console.error("Unity failed to load:", err);
@@ -109,7 +116,14 @@ function initUnity(canvasId, loaderUrl, dataUrl, frameworkUrl, codeUrl, productN
 }
 
 function unloadUnity() {
-    if (unityInstance) { unityInstance.Quit(); unityInstance = null; }
+    if (unityInstance) {
+        unityInstance.Quit();
+        unityInstance = null;
+    }
+    if (currentLoaderScript) {
+        currentLoaderScript.remove();
+        currentLoaderScript = null;
+    }
 }
 
 function checkScreen() {
