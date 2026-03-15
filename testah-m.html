@@ -74,13 +74,13 @@
 <!-- Desktop Game -->
 <div id="twegallery-p-container" class="game-container">
   <img src="loading-logo.png" class="loading-logo" id="desktop-loading-logo">
-  <canvas id="twegallery-p-canvas"></canvas>
+  <canvas id="twegallery-m-canvas"></canvas>
 </div>
 
 <!-- Mobile Game -->
 <div id="Mtwegallery-p-container" class="game-container">
   <img src="loading-logo.png" class="loading-logo" id="mobile-loading-logo">
-  <canvas id="Mtwegallery-p-canvas"></canvas>
+  <canvas id="Mtwegallery-m-canvas"></canvas>
 </div>
 
 <script>
@@ -135,8 +135,8 @@ function checkScreen() {
 
     if(width > 768){
         // DESKTOP
-        document.getElementById("twegallery-p-container").style.display = "block";
-        document.getElementById("Mtwegallery-p-container").style.display = "none";
+        document.getElementById("twegallery-m-container").style.display = "block";
+        document.getElementById("Mtwegallery-m-container").style.display = "none";
 
         if(currentPlatform !== "desktop"){
             unloadUnity();
@@ -153,8 +153,8 @@ function checkScreen() {
         }
     } else {
         // MOBILE
-        document.getElementById("twegallery-p-container").style.display = "none";
-        document.getElementById("Mtwegallery-p-container").style.display = "block";
+        document.getElementById("twegallery-m-container").style.display = "none";
+        document.getElementById("Mtwegallery-m-container").style.display = "block";
 
         if(currentPlatform !== "mobile"){
             unloadUnity();
