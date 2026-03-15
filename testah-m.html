@@ -155,64 +155,112 @@
       }
     }
 
-    function checkScreen() {
-      const width = window.innerWidth;
-      const desktopContainer = document.getElementById("twegallery-p-container");
-      const mobileContainer = document.getElementById("Mtwegallery-p-container");
+<script>
+let unityInstance = null;
+let currentPlatform = null;
 
-      if (!desktopContainer || !mobileContainer) {
-        console.error("Missing game containers in HTML.");
-        return;
-      }
+function initUnity(canvasId, loaderUrl, dataUrl, frameworkUrl, codeUrl, productName, logoId) {
+    return new Promise((resolve, reject) => {
+        const canvas = document.getElementById(canvasId);
+        const loadingLogo = document.getElementById(logoId);
 
-      if (width > 768) {
-        desktopContainer.style.display = "block";
-        mobileContainer.style.display = "none";
+        if (!canvas) {
+            reject("Canvas not found: " + canvasId);
+            return;
+        }
+
+        if (!loadingLogo) {
+            reject("Loading logo not found: " + logoId);
+            return;
+        }
+
+        loadingLogo.style.display = "block";
+
+        const loaderScript = document.createElement("script");
+        loaderScript.src = loaderUrl;
+
+        loaderScript.onload = () => {
+            createUnityInstance(canvas, {
+                dataUrl: dataUrl,
+                frameworkUrl: frameworkUrl,
+                codeUrl: codeUrl,
+                streamingAssetsUrl: "StreamingAssets",
+                companyName: "DefaultCompany",
+                productName: productName,
+                productVersion: "0.1"
+            }).then(instance => {
+                unityInstance = instance;
+                loadingLogo.style.display = "none";
+                resolve(instance);
+            }).catch(err => {
+                console.error("Unity failed to load:", err);
+                reject(err);
+            });
+        };
+
+        loaderScript.onerror = () => {
+            reject("Failed to load loader script: " + loaderUrl);
+        };
+
+        document.body.appendChild(loaderScript);
+    });
+}
+
+function unloadUnity() {
+    if (unityInstance) {
+        unityInstance.Quit();
+        unityInstance = null;
+    }
+}
+
+function checkScreen() {
+    const width = window.innerWidth;
+
+    const desktopContainer = document.getElementById("twegallery-p-container");
+    const mobileContainer = document.getElementById("Mtwegallery-p-container");
+
+    if (width > 768) {
+        if (desktopContainer) desktopContainer.style.display = "block";
+        if (mobileContainer) mobileContainer.style.display = "none";
 
         if (currentPlatform !== "desktop") {
-          unloadUnity();
+            unloadUnity();
+            initUnity(
+                "twegallery-m-canvas",
+                "twegallery-m.loader.js",
+                "twegallery-m.data",
+                "twegallery-m.framework.js",
+                "twegallery-m.wasm",
+                "twegallery-m",
+                "desktop-loading-logo"
+            ).catch(console.error);
 
-          initUnity(
-            "twegallery-m-canvas",
-            "twegallery-m.loader.js",
-            "twegallery-m.data",
-            "twegallery-m.framework.js",
-            "twegallery-m.wasm",
-            "twegallery-m",
-            "desktop-loading-logo"
-          ).catch(error => {
-            console.error("Desktop Unity load failed:", error);
-          });
-
-          currentPlatform = "desktop";
+            currentPlatform = "desktop";
         }
-      } else {
-        desktopContainer.style.display = "none";
-        mobileContainer.style.display = "block";
+    } else {
+        if (desktopContainer) desktopContainer.style.display = "none";
+        if (mobileContainer) mobileContainer.style.display = "block";
 
         if (currentPlatform !== "mobile") {
-          unloadUnity();
+            unloadUnity();
+            initUnity(
+                "Mtwegallery-m-canvas",
+                "Mtwegallery-m.loader.js",
+                "Mtwegallery-m.data",
+                "Mtwegallery-m.framework.js",
+                "Mtwegallery-m.wasm",
+                "Mtwegallery-m",
+                "mobile-loading-logo"
+            ).catch(console.error);
 
-          initUnity(
-            "Mtwegallery-m-canvas",
-            "Mtwegallery-m.loader.js",
-            "Mtwegallery-m.data",
-            "Mtwegallery-m.framework.js",
-            "Mtwegallery-m.wasm",
-            "Mtwegallery-m",
-            "mobile-loading-logo"
-          ).catch(error => {
-            console.error("Mobile Unity load failed:", error);
-          });
-
-          currentPlatform = "mobile";
+            currentPlatform = "mobile";
         }
-      }
     }
+}
 
-    window.addEventListener("load", checkScreen);
-    window.addEventListener("resize", checkScreen);
-  </script>
+checkScreen();
+window.addEventListener("resize", checkScreen);
+</script>
 
 </body>
 </html>
