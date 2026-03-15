@@ -10,7 +10,7 @@
       margin: 0;
       background: #000;
       color: #ff1500;
-      font-family: 'ZCOOL QingKe HuangYou', cursive;
+      font-family: sans-serif;
       text-align: center;
     }
 
@@ -36,13 +36,13 @@
       background: #0c0c0c;
     }
 
-    #twegallery-p-container canvas {
+    #twegallery-m-container canvas {
       width: 90%;
       height: auto;
       aspect-ratio: 16 / 9;
     }
 
-    #Mtwegallery-p-container canvas {
+    #Mtwegallery-m-container canvas {
       width: 90%;
       height: auto;
       aspect-ratio: 9 / 16;
@@ -57,6 +57,7 @@
       transform: translate(-50%, -50%);
       animation: spin 4s linear infinite;
       pointer-events: none;
+      z-index: 10;
     }
 
     @keyframes spin {
@@ -69,22 +70,37 @@
 
   <img id="logo" src="twegall-logo.png" alt="Logo">
 
-  <!-- Desktop Game -->
-  <div id="twegallery-p-container" class="game-container">
+  <div id="twegallery-m-container" class="game-container">
     <img src="loading-logo.png" class="loading-logo" id="desktop-loading-logo" alt="Loading">
-    <canvas id="twegallery-p-canvas"></canvas>
+    <canvas id="twegallery-m-canvas"></canvas>
   </div>
 
-  <!-- Mobile Game -->
-  <div id="Mtwegallery-p-container" class="game-container">
+  <div id="Mtwegallery-m-container" class="game-container">
     <img src="loading-logo.png" class="loading-logo" id="mobile-loading-logo" alt="Loading">
-    <canvas id="Mtwegallery-p-canvas"></canvas>
+    <canvas id="Mtwegallery-m-canvas"></canvas>
   </div>
 
   <script>
     let unityInstance = null;
     let currentPlatform = null;
     let currentLoaderScript = null;
+
+    function unloadUnity() {
+      const quitPromise = unityInstance ? unityInstance.Quit() : Promise.resolve();
+
+      return quitPromise.then(() => {
+        unityInstance = null;
+
+        if (currentLoaderScript) {
+          currentLoaderScript.remove();
+          currentLoaderScript = null;
+        }
+
+        if (typeof createUnityInstance !== "undefined") {
+          createUnityInstance = undefined;
+        }
+      });
+    }
 
     function initUnity(canvasId, loaderUrl, dataUrl, frameworkUrl, codeUrl, productName, logoId) {
       return new Promise((resolve, reject) => {
@@ -109,7 +125,8 @@
 
         loaderScript.onload = () => {
           if (typeof createUnityInstance !== "function") {
-            reject(new Error("createUnityInstance is not available after loading " + loaderUrl));
+            loadingLogo.style.display = "none";
+            reject(new Error("createUnityInstance not found after loading " + loaderUrl));
             return;
           }
 
@@ -128,89 +145,70 @@
             loadingLogo.style.display = "none";
             resolve(instance);
           })
-          .catch(error => {
+          .catch(err => {
             loadingLogo.style.display = "none";
-            reject(error);
+            console.error("Unity failed to load:", err);
+            reject(err);
           });
         };
 
         loaderScript.onerror = () => {
           loadingLogo.style.display = "none";
-          reject(new Error("Failed to load Unity loader: " + loaderUrl));
+          reject(new Error("Failed to load loader script: " + loaderUrl));
         };
 
         document.body.appendChild(loaderScript);
       });
     }
 
-    function unloadUnity() {
-      if (unityInstance) {
-        unityInstance.Quit();
-        unityInstance = null;
-      }
-
-      if (currentLoaderScript) {
-        currentLoaderScript.remove();
-        currentLoaderScript = null;
-      }
-    }
-
     function checkScreen() {
-      const width = window.innerWidth;
-      const desktopContainer = document.getElementById("twegallery-p-container");
-      const mobileContainer = document.getElementById("Mtwegallery-p-container");
+      const isDesktop = window.innerWidth > 768;
 
-      if (!desktopContainer || !mobileContainer) {
-        console.error("Missing game containers in HTML.");
-        return;
-      }
+      const desktopContainer = document.getElementById("twegallery-m-container");
+      const mobileContainer = document.getElementById("Mtwegallery-m-container");
 
-      if (width > 768) {
+      if (isDesktop) {
         desktopContainer.style.display = "block";
         mobileContainer.style.display = "none";
 
         if (currentPlatform !== "desktop") {
-          unloadUnity();
-
-          initUnity(
-            "twegallery-p-canvas",
-            "twegallery-m.loader.js",
-            "twegallery-m.data",
-            "twegallery-m.framework.js",
-            "twegallery-m.wasm",
-            "twegallery-m",
-            "desktop-loading-logo"
-          ).catch(error => {
-            console.error("Desktop Unity load failed:", error);
-          });
-
-          currentPlatform = "desktop";
+          unloadUnity().then(() => {
+            return initUnity(
+              "twegallery-m-canvas",
+              "twegallery-m.loader.js",
+              "twegallery-m.data",
+              "twegallery-m.framework.js",
+              "twegallery-m.wasm",
+              "twegallery-m",
+              "desktop-loading-logo"
+            );
+          }).then(() => {
+            currentPlatform = "desktop";
+          }).catch(console.error);
         }
       } else {
         desktopContainer.style.display = "none";
         mobileContainer.style.display = "block";
 
         if (currentPlatform !== "mobile") {
-          unloadUnity();
-
-          initUnity(
-            "Mtwegallery-p-canvas",
-            "Mtwegallery-m.loader.js",
-            "Mtwegallery-m.data",
-            "Mtwegallery-m.framework.js",
-            "Mtwegallery-m.wasm",
-            "Mtwegallery-m",
-            "mobile-loading-logo"
-          ).catch(error => {
-            console.error("Mobile Unity load failed:", error);
-          });
-
-          currentPlatform = "mobile";
+          unloadUnity().then(() => {
+            return initUnity(
+              "Mtwegallery-m-canvas",
+              "Mtwegallery-m.loader.js",
+              "Mtwegallery-m.data",
+              "Mtwegallery-m.framework.js",
+              "Mtwegallery-m.wasm",
+              "Mtwegallery-m",
+              "mobile-loading-logo"
+            );
+          }).then(() => {
+            currentPlatform = "mobile";
+          }).catch(console.error);
         }
       }
     }
 
-    window.addEventListener("load", checkScreen);
+    checkScreen();
     window.addEventListener("resize", checkScreen);
   </script>
 
