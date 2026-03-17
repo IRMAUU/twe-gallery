@@ -1,109 +1,234 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<link rel="shortcut icon" href="favicon.png">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" href="iconapp.png">
+  <meta charset="utf-8">
+  <link rel="shortcut icon" href="favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta property="og:title" content="◄☩ TWE 3D GALLERY ☩►"/>
   <meta property="twitter:title" content="◄☩ TWE 3D GALLERY ☩►"/>
   <meta property="og:image" content="https://i.ibb.co/ZzxvPr2M/thumb-A.png"/>
   <meta property="twitter:image" content="thumbA.png"/>
-<title>✠ UNDER CONSTRUCTION ✠</title>
-<style>
-  body {
-    margin: 0;
-    background: #000;
-    color: #ff1500;
-    font-family: 'ZCOOL QingKe HuangYou', cursive;
-    text-align: center;
-  }
-  #logo {
-    width: 70%;
-    max-width: 100%;
-    margin: 20px auto;
-    display: block;
-  }
-  .game-container {
-    display: none;
-    margin: 20px auto;
-    max-width: 1200px;
-    position: relative;
-    border-radius: 8px;
-    overflow: hidden;
-    background: #0c0c0c;
-  }
-  canvas {
-    display: block;
-    margin: 0 auto;
-    background: #0c0c0c;
-    width: 100%;
-    height: 100%;
-  }
+  <title>◄☩ TWE 3D GALLERY ☩►</title>
 
-  /* Desktop 16:9 */
-  #twegallery-container {
-    aspect-ratio: 16 / 9;
-  }
-  #twegallery-container canvas { width: 80%; height: auto; }
+  <!-- Roboto Mono -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@700&display=swap" rel="stylesheet">
 
-  /* Mobile 9:16 */
-  #Mtwegallery-container {
-    aspect-ratio: 9 / 16;
-    max-width: 600px;
-  }
-  #Mtwegallery-container canvas { width: 90%; height: auto; }
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      color: #ff1500;
+      font-family: 'ZCOOL QingKe HuangYou', cursive;
+      text-align: center;
+    }
 
-  /* Spinning logo - now BELOW the image */
-  .loading-logo {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 90px;
-    height: 90px;
-    transform: translate(-50%, -50%);
-    animation: spin 4s linear infinite;
-    pointer-events: none;
-    z-index: 5;               /* ← lower than the image */
-  }
+    #logo { 
+      width: 70%; 
+      max-width: 100%; 
+      margin: 20px auto; 
+      display: block; 
+    }
 
-  /* Under Construction image - now ON TOP */
-  .under-construction {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: 10;              /* ← higher than the logo */
-    pointer-events: none;
-  }
+    .game-container { 
+      display: none; 
+      margin: 20px auto;
+      max-width: 1750px;
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+    }
 
-  @keyframes spin {
-    from { transform: translate(-50%, -50%) rotate(0deg); }
-    to   { transform: translate(-50%, -50%) rotate(360deg); }
-  }
+    canvas { 
+      display: block; 
+      margin: 0 auto; 
+      background: #0c0c0c; 
+    }
 
-  /* Show correct container */
-  @media (min-width: 769px) { #twegallery-container { display: block; } }
-  @media (max-width: 768px)  { #Mtwegallery-container { display: block; } }
-</style>
+    #twegallery-p-container canvas { width: 90%; height: auto; aspect-ratio: 16/9; }
+    #Mtwegallery-p-container canvas { width: 90%; height: auto; aspect-ratio: 9/16; }
+
+    .loading-logo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 90px;
+      height: 90px;
+      transform: translate(-50%, -50%);
+      animation: spin 4s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* LINKS */
+    .links {
+      margin: 20px auto;
+      text-align: center;
+    }
+
+    .links a {
+      display: inline-block;
+      margin: 0 6px;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 8pt;
+      font-weight: bold;
+      text-decoration: underline;
+      color: #ff1500;
+    }
+
+    .links a:visited {
+      color: #ff1500;
+      text-decoration: underline;
+    }
+  </style>
 </head>
+
 <body>
 
 <img id="logo" src="twegall-logo.png" alt="Logo">
 
-<!-- Desktop -->
-<div id="twegallery-container" class="game-container">
-  <canvas id="twegallery-canvas"></canvas>
-  <img src="loading-logo.png" class="loading-logo">
-  <img src="ucdesk.png" class="under-construction" alt="Under Construction">
+<!-- Desktop Game -->
+<div id="twegallery-p-container" class="game-container">
+  <img src="loading-logo.png" class="loading-logo" id="desktop-loading-logo">
+  <canvas id="twegallery-m-canvas"></canvas>
 </div>
 
-<!-- Mobile -->
-<div id="Mtwegallery-container" class="game-container">
-  <canvas id="Mtwegallery-canvas"></canvas>
-  <img src="loading-logo.png" class="loading-logo">
-  <img src="ucmob.png" class="under-construction" alt="Under Construction">
+<!-- Mobile Game -->
+<div id="Mtwegallery-p-container" class="game-container">
+  <img src="loading-logo.png" class="loading-logo" id="mobile-loading-logo">
+  <canvas id="Mtwegallery-m-canvas"></canvas>
 </div>
+
+<!-- LINKS -->
+<div class="links">
+  <a href="https://www.elite-world.store" target="_blank">merch store</a>
+  <a href="https://instagram.com/3rd.world.elite" target="_blank">twe</a>
+  <a href="https://instagram.com/gtthk" target="_blank">dev</a>
+</div>
+
+<script>
+
+/* Gesture registration (Safari trust) */
+document.addEventListener("keydown", function(){});
+document.addEventListener("touchstart", function(){}, {passive:true});
+
+let unityInstance = null;
+let currentPlatform = null;
+let currentLoaderScript = null;
+
+function initUnity(canvasId, loaderUrl, dataUrl, frameworkUrl, codeUrl, productName, logoId) {
+    return new Promise((resolve, reject) => {
+        const canvas = document.getElementById(canvasId);
+        const loadingLogo = document.getElementById(logoId);
+        loadingLogo.style.display = "block";
+
+        if (currentLoaderScript) {
+            currentLoaderScript.remove();
+            currentLoaderScript = null;
+        }
+
+        const loaderScript = document.createElement("script");
+        loaderScript.src = loaderUrl;
+
+        loaderScript.onload = () => {
+            createUnityInstance(canvas, {
+                dataUrl: dataUrl,
+                frameworkUrl: frameworkUrl,
+                codeUrl: codeUrl,
+                streamingAssetsUrl: "StreamingAssets",
+                companyName: "DefaultCompany",
+                productName: productName,
+                productVersion: "0.1"
+            }).then(instance => {
+                unityInstance = instance;
+                loadingLogo.style.display = "none";
+                currentLoaderScript = loaderScript;
+                resolve();
+            }).catch(err => {
+                console.error("Unity failed to load:", err);
+                loadingLogo.style.display = "none";
+                reject(err);
+            });
+        };
+
+        loaderScript.onerror = () => reject("Failed to load loader: " + loaderUrl);
+        document.body.appendChild(loaderScript);
+    });
+}
+
+function unloadUnity() {
+    if (unityInstance) {
+        unityInstance.Quit();
+        unityInstance = null;
+    }
+
+    if (currentLoaderScript) {
+        currentLoaderScript.remove();
+        currentLoaderScript = null;
+    }
+}
+
+function checkScreen() {
+
+    const width = window.innerWidth;
+
+    const desktopContainer = document.getElementById("twegallery-p-container");
+    const mobileContainer = document.getElementById("Mtwegallery-p-container");
+
+    if (width > 768) {
+
+        desktopContainer.style.display = "block";
+        mobileContainer.style.display = "none";
+
+        if (currentPlatform !== "desktop") {
+
+            unloadUnity();
+
+            initUnity(
+                "twegallery-m-canvas",
+                "twegallery-m.loader.js",
+                "twegallery-m.data",
+                "twegallery-m.framework.js",
+                "twegallery-m.wasm",
+                "twegallery-m",
+                "desktop-loading-logo"
+            ).catch(console.error);
+
+            currentPlatform = "desktop";
+        }
+
+    } else {
+
+        desktopContainer.style.display = "none";
+        mobileContainer.style.display = "block";
+
+        if (currentPlatform !== "mobile") {
+
+            unloadUnity();
+
+            initUnity(
+                "Mtwegallery-m-canvas",
+                "Mtwegallery-m.loader.js",
+                "Mtwegallery-m.data",
+                "Mtwegallery-m.framework.js",
+                "Mtwegallery-m.wasm",
+                "Mtwegallery-m",
+                "mobile-loading-logo"
+            ).catch(console.error);
+
+            currentPlatform = "mobile";
+        }
+    }
+}
+
+checkScreen();
+window.addEventListener("resize", checkScreen);
+
+</script>
 
 </body>
 </html>
