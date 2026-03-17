@@ -56,6 +56,7 @@
     }
   </style>
 </head>
+
 <body>
 
 <img id="logo" src="twegall-logo.png" alt="Logo">
@@ -73,9 +74,30 @@
 </div>
 
 <script>
+
 let unityInstance = null;
 let currentPlatform = null;
 let currentLoaderScript = null;
+
+
+/* SAFARI POPUP IMPROVEMENT
+   Pre-open a tab during a real user gesture */
+let safariTab = null;
+
+document.addEventListener("click", function () {
+    if (!safariTab) {
+        safariTab = window.open("", "_blank");
+    }
+}, { once: true });
+
+
+/* Register keyboard gesture at page level */
+document.addEventListener("keydown", function(){});
+
+
+/* Register touch gesture (helps iOS Safari) */
+document.addEventListener("touchstart", function(){}, {passive:true});
+
 
 function initUnity(canvasId, loaderUrl, dataUrl, frameworkUrl, codeUrl, productName, logoId) {
     return new Promise((resolve, reject) => {
@@ -90,6 +112,7 @@ function initUnity(canvasId, loaderUrl, dataUrl, frameworkUrl, codeUrl, productN
 
         const loaderScript = document.createElement("script");
         loaderScript.src = loaderUrl;
+
         loaderScript.onload = () => {
             createUnityInstance(canvas, {
                 dataUrl: dataUrl,
@@ -110,6 +133,7 @@ function initUnity(canvasId, loaderUrl, dataUrl, frameworkUrl, codeUrl, productN
                 reject(err);
             });
         };
+
         loaderScript.onerror = () => reject("Failed to load loader: " + loaderUrl);
         document.body.appendChild(loaderScript);
     });
@@ -120,6 +144,7 @@ function unloadUnity() {
         unityInstance.Quit();
         unityInstance = null;
     }
+
     if (currentLoaderScript) {
         currentLoaderScript.remove();
         currentLoaderScript = null;
@@ -127,16 +152,21 @@ function unloadUnity() {
 }
 
 function checkScreen() {
+
     const width = window.innerWidth;
+
     const desktopContainer = document.getElementById("twegallery-p-container");
     const mobileContainer = document.getElementById("Mtwegallery-p-container");
 
     if (width > 768) {
+
         desktopContainer.style.display = "block";
         mobileContainer.style.display = "none";
 
         if (currentPlatform !== "desktop") {
+
             unloadUnity();
+
             initUnity(
                 "twegallery-m-canvas",
                 "twegallery-m.loader.js",
@@ -146,14 +176,19 @@ function checkScreen() {
                 "twegallery-m",
                 "desktop-loading-logo"
             ).catch(console.error);
+
             currentPlatform = "desktop";
         }
+
     } else {
+
         desktopContainer.style.display = "none";
         mobileContainer.style.display = "block";
 
         if (currentPlatform !== "mobile") {
+
             unloadUnity();
+
             initUnity(
                 "Mtwegallery-m-canvas",
                 "Mtwegallery-m.loader.js",
@@ -163,6 +198,7 @@ function checkScreen() {
                 "Mtwegallery-m",
                 "mobile-loading-logo"
             ).catch(console.error);
+
             currentPlatform = "mobile";
         }
     }
@@ -170,12 +206,7 @@ function checkScreen() {
 
 checkScreen();
 window.addEventListener("resize", checkScreen);
-  function OpenExternalURL(url)
-{
-    window.open(url, "_blank");
-}
 
-  document.addEventListener("keydown", function(){});
 </script>
 
 </body>
